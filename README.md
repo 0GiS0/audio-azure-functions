@@ -2,8 +2,8 @@
 
 Conversions using ffmpeg and transcriptions with Speech Service
 
-**Mp3ToWav**: It converts from MP3 to WAV in order to be treated by Speech service from Cognitive Services, but it can be used simply as a transformation method.
-**WavToText**: Use Speech Service to get the audio transcript.
+* **Mp3ToWav**: It converts from MP3 to WAV in order to be treated by Speech service from Cognitive Services, but it can be used simply as a transformation method.
+* **WavToText**: Use Speech Service to get the audio transcript.
 
 ## Quick Deploy to Azure
 
