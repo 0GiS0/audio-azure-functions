@@ -1,6 +1,9 @@
-# Audio utils Azure Functions
+# Audio Azure Functions
 
-It removes file metadata using Azure Functions
+Utilities for audio files in azure functions:
+
+**Mp3ToWav**: Itconverts from MP3 to WAV in order to be treated by Speech service from Cognitive Services, but it can be used simply as a transformation method.
+**WavToText**: Use Speech Service to get the audio transcript.
 
 ## Quick Deploy to Azure
 
