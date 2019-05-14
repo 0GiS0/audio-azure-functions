@@ -1,18 +1,14 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
-
+using System.Linq;
 
 namespace returngis.function
 {
@@ -28,12 +24,15 @@ namespace returngis.function
 
             var temp = string.Format("{0}.wav", Path.GetTempFileName());
 
-            using (var ms = new MemoryStream())
+            //Create a temp file
+            using (BinaryReader reader = new BinaryReader(myBlob))
             {
-                myBlob.CopyTo(ms);
-                File.WriteAllBytes(temp, ms.ToArray());
-            }
+                var bytes = reader.ReadBytes((int)myBlob.Length);
+                var outputStream = new MemoryStream(bytes, 0, bytes.Count());
 
+                File.WriteAllBytes(temp, outputStream.ToArray());
+            }
+                                
             log.LogInformation($"Temp file {temp} created.");
 
             using (var audioInput = AudioConfig.FromWavFileInput(temp))
@@ -100,7 +99,7 @@ namespace returngis.function
 
                     //save the file in the transcripts container                    
                     CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
-                    
+
                     var client = storageAccount.CreateCloudBlobClient();
                     var container = client.GetContainerReference("transcripts");
                     await container.CreateIfNotExistsAsync();
