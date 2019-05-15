@@ -2,33 +2,51 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "sites_audio_azure_functions_name": {
+    "FunctionName": {
       "defaultValue": "audio-functions",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Function account."
+      }
     },
-    "serverfarms_audio_azure_functions_plan_name": {
+    "AppServicePlan": {
       "defaultValue": "audio-plan",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "The name for the App Service plan you want to create for your Azure Function."
+      }
     },
-    "storageAccounts_audioazurefunctionstore_name": {
+    "StorageAccountName": {
       "defaultValue": "audiostore",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "The name for the storage account."
+      }
     },
-    "components_audio_azure_functions_insights_name": {
+    "ApplicationInsightsName": {
       "defaultValue": "audio-insights",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "The name for the Application Insights service"
+      }
     },
-    "accounts_audio_azure_functions_speech_name": {
+    "SpeechAccountName": {
       "defaultValue": "audio-speech",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "The name for the speech account."
+      }
     },
     "SpeechLanguage": {
       "defaultValue": "en-US",
-      "type": "String"
+      "type": "string",
+      "metadata": {
+        "description": "The language you want to use to convert from speech to text."
+      }
     }
   },
   "variables": {
-    "contentShareName": "[toLower(parameters('sites_audio_azure_functions_name'))]",
+    "contentShareName": "[toLower(parameters('FunctionName'))]",
     "repoUrl": "https://github.com/0GiS0/audio-azure-functions.git",
     "branch": "master"
   },
@@ -36,8 +54,8 @@
     {
       "type": "Microsoft.CognitiveServices/accounts",
       "apiVersion": "2016-02-01-preview",
-      "name": "[parameters('accounts_audio_azure_functions_speech_name')]",
-      "location": "northeurope",
+      "name": "[parameters('SpeechAccountName')]",
+      "location": "[resourceGroup().location]",
       "sku": {
         "name": "S0"
       },
@@ -47,8 +65,8 @@
     {
       "type": "microsoft.insights/components",
       "apiVersion": "2015-05-01",
-      "name": "[parameters('components_audio_azure_functions_insights_name')]",
-      "location": "northeurope",
+      "name": "[parameters('ApplicationInsightsName')]",
+      "location": "[resourceGroup().location]",
       "kind": "web",
       "properties": {
         "Application_Type": "web",
@@ -58,8 +76,8 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2018-07-01",
-      "name": "[parameters('storageAccounts_audioazurefunctionstore_name')]",
-      "location": "northeurope",
+      "name": "[parameters('StorageAccountName')]",
+      "location": "[resourceGroup().location]",
       "sku": {
         "name": "Standard_LRS",
         "tier": "Standard"
@@ -89,8 +107,8 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2016-09-01",
-      "name": "[parameters('serverfarms_audio_azure_functions_plan_name')]",
-      "location": "North Europe",
+      "name": "[parameters('AppServicePlan')]",
+      "location": "[resourceGroup().location]",
       "sku": {
         "name": "S1",
         "tier": "Standard",
@@ -100,7 +118,7 @@
       },
       "kind": "app",
       "properties": {
-        "name": "[parameters('serverfarms_audio_azure_functions_plan_name')]",
+        "name": "[parameters('AppServicePlan')]",
         "perSiteScaling": false,
         "reserved": false,
         "targetWorkerCount": 0,
@@ -110,10 +128,10 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2016-08-01",
-      "name": "[parameters('sites_audio_azure_functions_name')]",
-      "location": "North Europe",
+      "name": "[parameters('FunctionName')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_audio_azure_functions_plan_name'))]"
+        "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlan'))]"
       ],
       "kind": "functionapp",
       "properties": {
@@ -121,15 +139,15 @@
           "appSettings": [
             {
               "name": "AzureWebJobsDashboard",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccounts_audioazurefunctionstore_name'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_audioazurefunctionstore_name')), '2015-05-01-preview').key1)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('StorageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2015-05-01-preview').key1)]"
             },
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccounts_audioazurefunctionstore_name'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_audioazurefunctionstore_name')), '2015-05-01-preview').key1)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('StorageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2015-05-01-preview').key1)]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccounts_audioazurefunctionstore_name'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_audioazurefunctionstore_name')), '2015-05-01-preview').key1)]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('StorageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName')), '2015-05-01-preview').key1)]"
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
@@ -141,11 +159,11 @@
             },
             {
               "name": "SpeechKey",
-              "value": "[listKeys(parameters('accounts_audio_azure_functions_speech_name'),'2016-02-01-preview').key1]"
+              "value": "[listKeys(parameters('SpeechAccountName'),'2016-02-01-preview').key1]"
             },
             {
               "name": "SpeechRegion",
-              "value": "northeurope"
+              "value": "[resourceGroup().location]"
             },
             {
               "name": "ffmpegPath",
@@ -160,17 +178,17 @@
         "enabled": true,
         "hostNameSslStates": [
           {
-            "name": "[concat(parameters('sites_audio_azure_functions_name'), '.azurewebsites.net')]",
+            "name": "[concat(parameters('FunctionName'), '.azurewebsites.net')]",
             "sslState": "Disabled",
             "hostType": "Standard"
           },
           {
-            "name": "[concat(parameters('sites_audio_azure_functions_name'), '.scm.azurewebsites.net')]",
+            "name": "[concat(parameters('FunctionName'), '.scm.azurewebsites.net')]",
             "sslState": "Disabled",
             "hostType": "Repository"
           }
         ],
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_audio_azure_functions_plan_name'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlan'))]",
         "reserved": false,
         "scmSiteAlsoStopped": false,
         "clientAffinityEnabled": false,
@@ -182,7 +200,7 @@
       }
     },
     {
-      "name": "[concat(parameters('sites_audio_azure_functions_name'), '/web')]",
+      "name": "[concat(parameters('FunctionName'), '/web')]",
       "type": "Microsoft.Web/sites/sourcecontrols",
       "apiVersion": "2018-02-01",
       "properties": {
@@ -191,16 +209,16 @@
         "isManualIntegration": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_audio_azure_functions_name'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('FunctionName'))]"
       ]
     },
     {
       "type": "Microsoft.Web/sites/config",
       "apiVersion": "2016-08-01",
-      "name": "[concat(parameters('sites_audio_azure_functions_name'), '/web')]",
-      "location": "North Europe",
+      "name": "[concat(parameters('FunctionName'), '/web')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_audio_azure_functions_name'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('FunctionName'))]"
       ],
       "properties": {
         "numberOfWorkers": 1,
@@ -294,10 +312,10 @@
     {
       "type": "Microsoft.Web/sites/hostNameBindings",
       "apiVersion": "2016-08-01",
-      "name": "[concat(parameters('sites_audio_azure_functions_name'), '/', parameters('sites_audio_azure_functions_name'), '.azurewebsites.net')]",
-      "location": "North Europe",
+      "name": "[concat(parameters('FunctionName'), '/', parameters('FunctionName'), '.azurewebsites.net')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sites_audio_azure_functions_name'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('FunctionName'))]"
       ],
       "properties": {
         "siteName": "audio-azure-functions",
@@ -305,10 +323,6 @@
       }
     }
   ],
-  "outputs": {
-    "speech-region": {
-      "type": "object",
-      "value": "[reference(parameters('accounts_audio_azure_functions_speech_name'),'2016-02-01-preview')]"
-    }
+  "outputs": {    
   }
 }
