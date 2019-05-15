@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "audio-azure-functions", "audio-azure-functions.csproj", "{84271878-B4EA-445B-9F45-53001174C64E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84271878-B4EA-445B-9F45-53001174C64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84271878-B4EA-445B-9F45-53001174C64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84271878-B4EA-445B-9F45-53001174C64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84271878-B4EA-445B-9F45-53001174C64E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {44F6C2B8-5FB8-4056-8DB3-930B7DCD4F30}
+	EndGlobalSection
+EndGlobal

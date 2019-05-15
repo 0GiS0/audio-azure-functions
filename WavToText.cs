@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage;
-
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using System.Linq;
@@ -20,6 +19,9 @@ namespace returngis.function
             log.LogInformation($"WavToText processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
 
             var config = SpeechConfig.FromSubscription(Environment.GetEnvironmentVariable("SpeechKey"), Environment.GetEnvironmentVariable("SpeechRegion"));
+            //https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support (en-us by default)
+            config.SpeechRecognitionLanguage = Environment.GetEnvironmentVariable("SpeechLanguage");
+
             var stopRecognition = new TaskCompletionSource<int>();
 
             var temp = string.Format("{0}.wav", Path.GetTempFileName());
@@ -32,7 +34,7 @@ namespace returngis.function
 
                 File.WriteAllBytes(temp, outputStream.ToArray());
             }
-                                
+
             log.LogInformation($"Temp file {temp} created.");
 
             using (var audioInput = AudioConfig.FromWavFileInput(temp))
@@ -91,6 +93,8 @@ namespace returngis.function
 
                     // Starts continuous recognition. Uses StopContinuousRecognitionAsync() to stop recognition.
                     await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false);
+
+                    log.LogInformation("Speech recognition language: {0}", recognizer.SpeechRecognitionLanguage);
 
                     Task.WaitAny(new[] { stopRecognition.Task });
 
